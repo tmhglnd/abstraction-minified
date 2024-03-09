@@ -2,6 +2,12 @@
 
 A minified version of the [`.abstraction()`](https://github.com/tmhglnd/abstraction) installation that can be run on a RPi2+ with a small LCD screen and controlled with a self-build wireless controller using an ESP32.
 
+## Support my work
+
+[![](https://img.shields.io/static/v1?label=Support%20on%20Ko-Fi&message=%E2%9D%A4&logo=Kofi)](https://ko-fi.com/I2I3SV7FX)
+[![](https://img.shields.io/static/v1?label=Support%20on%20Patreon&message=%E2%9D%A4&logo=Patreon)](https://www.patreon.com/bePatron?u=9649817)
+[![](https://img.shields.io/static/v1?label=Support%20on%20Gumroad&message=%E2%9D%A4&logo=Gumroad)](https://tmhglnd.gumroad.com/)
+
 <!-- ![](./images/img1.JPG) -->
 
 # Install
@@ -56,9 +62,9 @@ You can switch versions with:
 
 Now download/clone this repository and navigate inside the folder with `cd`.
 
-Run `npm install` to install the dependencies.
+Now follow the steps from [Install](#install). 
 
-Then run `npm start` to start the server. Navigate to `https://localhost:3000` to see the installation start up.
+Optionally run `node server.js --debug` to see logs of received osc-messages to check connection with controller.
 
 ## Run process on boot on rPi
 
