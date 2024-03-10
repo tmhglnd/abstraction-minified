@@ -280,7 +280,7 @@
 					.out(${o})`,
 				'smear' : (o, v) =>
 					`src(o0)
-						.modulate(voronoi(10, 0.1, 0), () => cos(${v} * 8 * pi2) * 0.01)
+						.modulate(voronoi(10, 0.1, 0), () => cos(${v} * 8 * pi2) * 0.025)
 						.hue(() => sin(${v} * 4 * pi2) * 0.005)
 						.diff(solid(0, 0.8, 0.9).mask(noise(1, 0.2).thresh(0.5, 0)))
 					.out(${o})`,
