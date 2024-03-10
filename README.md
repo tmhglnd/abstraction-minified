@@ -28,6 +28,20 @@ Then navigate in the browser to:
 
 It is possible to run this installation on a Raspberry Pi 4+ (3 or 2 are also possible but on a low visual resolution, like 160x90 pixels or less, this however is aesthetically quite pleasing!).
 
+### Table of Content
+
+- [Install NodeJS](#install-nodejs-and-node-version-manager-on-rpi)
+- [Run Process on Boot](#run-process-on-boot-on-rpi)
+- [Run Browser fullscreen](#run-browser-in-fullscreen-on-rpi)
+- [Remove screensaver and mouse](#remove-screensaver-and-mouse)
+- [Extend with RPi screen](#extend-with-an-rpi-screen)
+- [Built hardware controller](#built-the-hardware-controller)
+- [Uploading code to ESP32](#uploading-code-to-the-esp32)
+- [Making RPi into WiFi Accesspoint](#setting-up-rpi-as-wifi-access-point)
+- [Ack](#acknowledgements)
+- [Thanks to](#tanks-to)
+- [License](#license)
+
 ## Install NodeJS and Node Version Manager on RPi
 
 First install NodeJS `node` via the terminal.
@@ -132,7 +146,35 @@ Set the correct resolution via the Preferences > Configuration of the RPi. If yo
 
 ## Built the hardware controller
 
-## Using the ESP32 Lolin
+The [ESP32 Lolin](https://www.wemos.cc/en/latest/d32/d32.html) is a microcontroller that has many of the same functionalities as an Arduino allowing us to read the voltage from a potmeter (variable resistor) or some other sensor through an `analogRead()`. The extra benefit of this microcontroller is that it can run wireless, accessing a WiFi network or creating its own access point. It also can be powered through a LiPo battery of 500mAh.
+
+Connect the potentiometers of your choice to the board. For example a standard potentiometer of 10kOhm can be connected easily. The potmeter has 3 pins, leftmost pin can go to the ground (GND), rightmost pin goes to the power (3V). The middle pin can be read from a GPIO pin on the ESP32 board.
+
+**Note: Choose a GPIO pin from ADC1**. [See the schematic here](https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fmischianti.org%2Fwp-content%2Fuploads%2F2020%2F11%2FESP32-WeMos-LOLIN32-pinout-mischianti-1024x562.png&f=1&nofb=1&ipt=88e6d3051ddbbf0c0ed73a787bd206160372b5ab19359411a17a5456f0aa1b12&ipo=images) Pins with ADC2 are disabled when the ESP32 is connected via WiFi.
+
+## Uploading code to the ESP32
+
+Install the [Arduino IDE](https://www.arduino.cc/en/software) for your operating system.
+
+Start the Arduino IDE and install the *esp32* by *Espressif Systems* via the Boards Manager.
+
+Also install the *OSC* library by *Adrien Freed and Yotam Mann* via the Library Manager.
+
+Connect the board via a micro-usb cable. Note: Make sure the cable allows for data transfer. Open the `controller.ino` arduino sketch from the folder arduino.
+
+Click on *Select Board* and select the USB port the ESP32 is connected to. In the BOARDS menu that pops up select WEMOS LOLIN32.
+
+Upload the sketch to the board by clicking the **->** arrow (or `CMD + U`)
+
+The LED starts to blink rapidly every 50 ms. This means it is searching for a WiFi network to connect to. Follow the instructions below to setup this WiFi Access Point on the RPi. After choosing an `ssid` and `wpa_passphrase` you can adjust this in your arduino code and upload again:
+
+```c
+// WiFi network name and password replace with your own:
+const char * networkName = "RPiAccessPoint";
+const char * networkPswd = "RPiPassWord";
+```
+
+If the connection works the LED blinks slowly, every 500 ms.
 
 ## Setting up RPi as WiFi Access Point
 
@@ -206,14 +248,14 @@ Save and quit. Got to the next file: `sudo nano /etc/hostapd/hostapd.conf`. Add 
 ```
 country_code=US
 interface=wlan0
-ssid=YourWirelessNameHere
+ssid=RPiAccessPoint
 hw_mode=a
 channel=48
 macaddr_acl=0
 auth_algs=1
 ignore_broadcast_ssid=0
 wpa=2
-wpa_passphrase=YourPasswordHere
+wpa_passphrase=RPiPassWord
 wpa_key_mgmt=WPA-PSK
 wpa_pairwise=TKIP
 rsn_pairwise=CCMP
@@ -246,12 +288,14 @@ This installation is a derivative of the `.abstraction()` installation that was 
 	- [https://www.raspberrypi.com/software/](https://www.raspberrypi.com/software/)
 - Chromium Browser
 	- [https://www.chromium.org/Home/](https://www.chromium.org/Home/)
-- Arduino Uno
+- Arduino
 	- [https://www.arduino.cc/](https://www.arduino.cc/)
-- HD44780 LCD by Bill Perry
-	- [https://github.com/duinoWitchery/hd44780](https://github.com/duinoWitchery/hd44780)
+- Wemos Lolin32
+	- [https://www.wemos.cc/en/latest/](https://www.wemos.cc/en/latest/)
 - OSC For Arduino by Yotam Mann and Adrien Freed
 	- [https://github.com/CNMAT/OSC](https://github.com/CNMAT/OSC)
+- HD44780 LCD by Bill Perry
+	- [https://github.com/duinoWitchery/hd44780](https://github.com/duinoWitchery/hd44780)
 - NodeJS
 	- [https://nodejs.org/en/](https://nodejs.org/en/)
 - Node Package Manager (npm)
