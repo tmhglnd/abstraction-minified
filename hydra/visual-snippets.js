@@ -14,11 +14,11 @@ speed = 1;
 let v = 0.1;
 
 // squiggle
-gradient(0).pixelate(4,4)
-.hue(() => 1-(v * 0.5 + 0.4))
-.mask(shape(8).scale( () => v + 3, 0.26))
-.rotate(0, () => v * 2).repeat(4,4)
-.modulate(noise(2, 0.1), () => cos(v * pi * 4) * 2)
+gradient(0).hue(() => cos(v * pi * 3))
+.mask(shape(8, 0.1, 0.3).scale( () => v + 3, 0.26))
+.rotate(0, () => sin(v * pi))
+.modulate(noise(2.4, 0.3), () => cos(v * pi * 4) * 0.5 + 0.6)
+.add(src(o0).scale(1.02), 0.9)
 .out(o0)
 
 // mosaic

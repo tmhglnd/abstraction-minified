@@ -62,7 +62,7 @@ let osc = new Server(oscPort, '0.0.0.0', () => {
 	// receive messages and forward
 	osc.on('message', (msg) => {
 		// print received messages if --debug
-		if (verbose){ console.log(`received: ${msg}`) }
+		if (verbose){ console.log('received:', ...msg) }
 
 		// store the new values as the initials 
 		// for when page gets refreshed
