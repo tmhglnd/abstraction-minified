@@ -38,8 +38,7 @@ It is possible to run this installation on a Raspberry Pi 4+ (3 or 2 are also po
 - [Built hardware controller](#built-the-hardware-controller)
 - [Uploading code to ESP32](#uploading-code-to-the-esp32)
 - [Making RPi into WiFi Accesspoint](#setting-up-rpi-as-wifi-access-point)
-- [Ack](#acknowledgements)
-- [Thanks to](#tanks-to)
+- [Acknowledgements](#acknowledgements)
 - [License](#license)
 
 ## Install NodeJS and Node Version Manager on RPi
@@ -280,7 +279,7 @@ For troubleshooting see [this page](https://learn.adafruit.com/setting-up-a-rasp
 
 This installation is a derivative of the `.abstraction()` installation that was originally commissioned by the [CODA Museum](https://www.coda-apeldoorn.nl/) in Apeldoorn, The Netherlands.
 
-# This all was possible thanks to the following great platforms and libraries
+This project was made possible thanks to the usage following amazing platforms and libraries:
 
 - Raspberry Pi
 	- [https://www.raspberrypi.com/](https://www.raspberrypi.com/)
