@@ -130,6 +130,110 @@ Set the correct resolution via the Preferences > Configuration of the RPi. If yo
 
 `dtoverlay=ads7846`
 
+## Built the hardware controller
+
+## Using the ESP32 Lolin
+
+## Setting up RPi as WiFi Access Point
+
+By setting up the Raspberry Pi as a WiFi Access Point you allow the ESP32 to automatically connect to it and send the potmeter information as osc-messages over the wireless network. This gives the installation a wireless controller that you can play with.
+
+When using an Raspberry Pi 2 make sure you connect a WiFi dongle such as the Wi-Pi wlan module.
+
+The following steps are adapted from the [Adafruit tutorial](https://learn.adafruit.com/setting-up-a-raspberry-pi-as-a-wifi-access-point/install-software).
+
+Boot the RPi and check if it can ping out to the internet with `ping 8.8.8.8`. Use `ctrl + c` to quit. Expected result in the terminal:
+
+```
+PING 8.8.8.8 (8.8.8.8) 56(84) bytes of data.
+64 bytes from 8.8.8.8: ...
+--- 8.8.8.8 ping statistics ---
+x packets transmitted, x received, 0% packet loss, time xxxxms
+```
+
+Check if the WiFi hardware is connected properly to allowing connections with `ifconfig -a`. You should see `wlan0` listed.
+
+Update the RPi with `sudo apt update` and then `sudo apt -y upgrade`.
+
+When done run the following commands:
+
+`sudo apt install -y hostapd dnsmasq`
+
+`sudo systemctl unmask hostapd`
+
+`sudo systemctl enable hostapd`
+
+`sudo DEBIAN_FRONTEND=noninteractive apt install -y netfilter-persistent iptables-persistent`
+
+`sudo reboot`
+
+After rebooting go back in the terminal to edit the following files using `nano` or another editor of your choice. 
+
+`sudo nano /etc/dhcpcd.conf`
+
+In `dhcpcd.conf` add the following to the bottom. Note: the 4 spaces for indentation are important!
+
+```
+interface wlan0
+    static ip_address=192.168.4.1/24
+    nohook wpa_supplicant
+```
+
+Run `ctrl + x` to save and quit. Move to the next file:
+
+`sudo nano /etc/sysctl.d/routed-ap.conf` and add:
+
+```
+# Enable IPv4 routing
+net.ipv4.ip_forward=1
+```
+
+Save and quit. Go to the next file: `sudo nano /etc/dnsmasq.conf`. Add the following to the top of the file:
+
+```
+# Listening interface
+interface=wlan0
+# Pool of IP addresses served via DHCP
+dhcp-range=192.168.4.2,192.168.4.20,255.255.255.0,24h
+# Local wireless DNS domain
+domain=wlan
+# Alias for this router
+address=/gw.wlan/192.168.4.1
+```
+
+Save and quit. Got to the next file: `sudo nano /etc/hostapd/hostapd.conf`. Add the following:
+
+```
+country_code=US
+interface=wlan0
+ssid=YourWirelessNameHere
+hw_mode=a
+channel=48
+macaddr_acl=0
+auth_algs=1
+ignore_broadcast_ssid=0
+wpa=2
+wpa_passphrase=YourPasswordHere
+wpa_key_mgmt=WPA-PSK
+wpa_pairwise=TKIP
+rsn_pairwise=CCMP
+# driver=nl80211
+```
+
+Adjust the settings based for `country_code`, `ssid`, `hw_mode`, `channel` and `wpa_passphrase`. Find your [country_code here](https://en.wikipedia.org/wiki/ISO_3166-1#Current_codes). For hw_mode, use `a` for 5GHz (RPi3B+), `b` for 2.4GHz and `g` for usb WiFi dongles. The channel depends on the hw_mode and the country_code. For b-g use `1-11` as a channel, for a the range is larger. The `driver=nl80211` can be uncommented for usage of WiFi dongles with an 802.11n chip.
+
+Finally run the following lines:
+
+`sudo raspi-config nonint do_wifi_country US` (replace US with your country_code)
+
+`sudo iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE`
+
+`sudo netfilter-persistent save`
+
+`sudo reboot`
+
+For troubleshooting see [this page](https://learn.adafruit.com/setting-up-a-raspberry-pi-as-a-wifi-access-point/test-and-troubleshoot)
+
 # Acknowledgements
 
 This installation is a derivative of the `.abstraction()` installation that was originally commissioned by the [CODA Museum](https://www.coda-apeldoorn.nl/) in Apeldoorn, The Netherlands.

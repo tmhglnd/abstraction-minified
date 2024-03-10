@@ -45,11 +45,10 @@ src(o0)
 // .modulateKaleid(shape(() => int(v * 4) + 2, 0.2, () => sin(v * pi * 9) * 0.5 + 0.5).repeat(3), 6)
 // .colorama(() => cos(v * pi * 2) * 0.01 + 7)
 // .out(o0)
-
-osc(10, 0.3).color(0, 0, cos(v * pi * 3))
+osc(10, 0.3).color(0, () => cos(v * pi * 3), 1)
 .modulateKaleid(shape(() => int(v * 3) + 2, 0.2, 
 	() => sin(v * pi * 9) * 0.5 + 0.5).repeat(11, 3), 6)
-.colorama(0.4).saturate(3)
+.colorama(0.4).saturate(5)
 .out(o0)
 
 // paint
