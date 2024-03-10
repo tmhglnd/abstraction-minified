@@ -29,22 +29,26 @@ const server = app.listen(port, () => {
 const io = socket(server);
 
 // initialize all visuals
-// let init = {
-// 	'/control1/function' : 1024/5,
-// 	'/control2/function' : 1024/5*3,
-// 	'/control1/value' : Math.random()*1024,
-// 	'/control2/value' : Math.random()*1024,
-// 	'/control1/switch' : 1,
-// 	'/control2/switch' : 1,
-// }
+let init = {};
 
 // post socket id to max console
 io.sockets.on('connection', function(socket){
 	console.log(`Connected ${socket.id}`);
 
-	// for (i in init){
-	// 	io.emit('message', i, init[i]);
-	// }
+	// randomize initial values
+	init = {
+		'/control1/function' : Math.random()*4096,
+		'/control2/function' : Math.random()*4096,
+		'/control1/value' : Math.random()*4096,
+		'/control2/value' : Math.random()*4096,
+		'/control1/switch' : 1,
+		'/control2/switch' : 1,
+	}
+
+	for (i in init){
+		console.log('send', i, init[i]);
+		io.emit('message', i, init[i]);
+	}
 });
 
 // require dependency for receiving controller values
