@@ -91,7 +91,7 @@
 			let sin = Math.sin;
 			let cos = Math.cos;
 			let int = Math.floor;
-			let pi = Math.PI;
+			let pi2 = Math.PI;
 			let rand = Math.random;
 
 			// canvas setup for the hydra visuals
@@ -124,36 +124,42 @@
 
 			// initialize solid black screens
 			solid().out(o0);
-			solid().out(o1);
+			// solid().out(o1);
 			// render(o3);
-			render(o0);
+			// render(o0);
 			
 			// create a mask (split screen in black/white on half width)
 			// osc(Math.PI*2,0).thresh(0.5, 0).out(o2);
-			
 			// split();
 			
 			// storage for incoming parameters from controller
 			let c1 = { value: 0, function: 0, switch: 0, sound: null };
 			let c2 = { value: 0, function: 0, switch: 0, sound: null };
 		
-			// A timer that lowers the sound when the installation is not used
-			// let timer;
-			// function resetTimer(){
-			// 	// reset timer that turns of sound
-			// 	clearTimeout(timer);
-			// 	timer = setTimeout(() => p.outputVolume(0.125, 1), 15000);
-			// 	// turn on volume if controller is touched
-			// 	p.outputVolume(0.7, 0.5);
-			// }
+			// A timer that makes the code transparent when the 
+			// installation is not used for a little while
+			let timer;
+			function resetTimer(){
+				// reset timer that turns of sound
+				clearTimeout(timer);
+				timer = setTimeout(() => {
+					document.getElementById('o0').style.opacity = 0.5;
+					// p.outputVolume(0.125, 1);
+				}, 10000);
+				// turn on volume if controller is touched
+				// p.outputVolume(0.7, 0.5);
+				document.getElementById('o0').style.opacity = 1;
+			}
 
 			// receive messages from the controllers
 			let socket = io();
 			
 			// The socket receives all the messages from the controllers
 			socket.on('message', (...msg) => {
-				// reset the timer when the controller is used
-				// resetTimer();
+				// reset the timer when the controller is used to 
+				// display the code and after a while make it transparent
+				resetTimer();
+				
 				// console.log('received:', ...msg);
 
 				// if both controllers' switch is pressed merge the visuals
@@ -163,13 +169,13 @@
 				// 	} else if (msg[0].match(/control2/)){
 				// 		c2.switch = !msg[1];
 				// 	}
-
 				// 	if (c1.switch && c2.switch){
 				// 		merge();
 				// 	} else {
 				// 		split();
 				// 	}
 				// }
+
 				// route incoming messages and change values for code
 				if (msg[0].match(/control1/)){
 					// if the message comes from controller 1
@@ -261,41 +267,34 @@
 			let codeSnippets = {
 				'squiggle' : (o, v) => 
 					`solid().add(gradient(0)
-						.hue(() => cos(${v} * pi * 3))
+						.hue(() => cos(${v} * pi2 * 3))
 						.mask(shape(8, 0.1, 0.3)
 							.scale( () => ${v} + 3, 0.26)).rotate(0, 0.1)
-							.modulate(noise(() => sin(${v} * pi) + 2.1, 0.3), 
-							() => cos(${v} * pi * 4) * 0.5 + 0.6)
+							.modulate(noise(() => sin(${v} * pi2) + 2.1, 0.3), () => cos(${v} * pi2 * 4) * 0.5 + 0.6)
 							.add(src(o0).scale(1.02), 0.9))
 					.out(${o})`,
 				'mosaic' : (o, v) =>
 					`osc(4,0.1,() => ${v} * 2 + 1.7).kaleid(3)
-						.colorama(() => cos(${v} * pi * 6) * 0.1 + 0.1)  
-						.modulatePixelate(voronoi(5, 0.15, 0), 
-							() => sin(${v} * pi * 4) * 10 + 11)
+						.colorama(() => cos(${v} * pi2 * 6) * 0.1 + 0.1)  
+						.modulatePixelate(voronoi(5, 0.15, 0), () => sin(${v} * pi2 * 4) * 10 + 11)
 					.out(${o})`,
 				'smear' : (o, v) =>
-					`src(${o})
-						.modulate(voronoi(10, 0.1, 0), 
-							() => cos(${v} * 8 * pi) * 0.01)
-						.hue(() => sin(${v} * 4 * pi) * 0.005)
-						.scale(() => cos(${v} * 3 * pi) * 0.02 + 1)
-						.diff(osc(1, 0.4, 2.5)
-						.mask(voronoi(() => ${v} * 10 + 2, 0.5, 0)
-							.thresh(0.7)))
+					`src(o0)
+						.modulate(voronoi(10, 0.1, 0), () => cos(${v} * 8 * pi2) * 0.01)
+						.hue(() => sin(${v} * 4 * pi2) * 0.005)
+						.diff(solid(0, 0.8, 0.9).mask(noise(1, 0.2).thresh(0.5, 0)))
 					.out(${o})`,
 				'glass' : (o, v) =>
-					`osc(10, 0.3).color(0, () => cos(${v} * pi * 3), 1)
-						.modulateKaleid(shape(() => int(${v} * 3) + 2, 
-							0.2, () => sin(${v} * pi * 9) * 0.5 + 0.5)
+					`osc(10, 0.3).color(0, () => cos(${v} * pi2 * 3), 1)
+						.modulateKaleid(shape(() => int(${v} * 3) + 2, 0.2, () => sin(${v} * pi2 * 9) * 0.5 + 0.5)
 								.repeat(11, 3), 6)
 						.colorama(0.4).saturate(5)
 					.out(${o})`,
 				'paint' : (o, v) =>
-					`noise(() => cos(${v} * pi * 5) * 0.2 + 0.3, 0.05)
+					`noise(() => cos(${v} * pi2 * 5) * 0.2 + 0.3, 0.05)
 						.colorama(() => ${v} * 0.01 + 6)
-						.hue(() => sin(${v} * pi) * -0.3)
-						.modulate(noise(() => cos(${v} * pi * 2) * 2 + 4))
+						.hue(() => sin(${v} * pi2) * -0.3)
+						.modulate(noise(() => cos(${v} * pi2 * 2) * 2 + 4))
 					.out(${o})`,
 			}
 			
