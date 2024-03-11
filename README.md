@@ -126,7 +126,7 @@ To avoid letting the screen go to black when not using the rPi install xscreensa
 
 `sudo apt-get install xscreensaver`
 
-Open the application and disable the screensaver.
+Open the application and disable the screensaver. Maybe a reboot of the RPi is necessary before the application runs correctly.
 
 To hide the mouse when not moving the curser install unclutter:
 
