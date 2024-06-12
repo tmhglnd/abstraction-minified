@@ -74,7 +74,7 @@ int sinceOSC = 0;
 
 // history for potmeters to filter noise with threshold
 int _p1, _p2;
-int thresh = 6;
+int thresh = 10;
 
 // history for potmeter smoothing
 float _s1, _s2;
@@ -102,16 +102,16 @@ void setup(){
   // enable cursor blinking
   // lcd.blink();
 
+  // connect to the WiFi network and start udp
+  connectToWiFi(networkName, networkPswd);
+  // udp.begin(udpPort);
+
   // run the startscreen
   lcd.setRGB(255, 255, 255);
   startScreen();
 
   // initialize the rotary encoder
   rot.begin();
- 
-  // connect to the WiFi network and start udp
-  connectToWiFi(networkName, networkPswd);
-  // udp.begin(udpPort);
 }
 
 void loop(){
@@ -134,11 +134,11 @@ void loop(){
   // }
 
   // read the values from the potmeters
-  int pot1 = analogRead(POT_PIN1);
+  // int pot1 = analogRead(POT_PIN1);
   int pot2 = analogRead(POT_PIN2);
 
   // apply a lowpass filter on the readings
-  _s1 = pot1 * (1-smooth) + _s1 * smooth;
+  // _s1 = pot1 * (1-smooth) + _s1 * smooth;
   _s2 = pot2 * (1-smooth) + _s2 * smooth;
 
   // Uncomment for plotting in the Serial Plotter and Monitor
@@ -149,8 +149,8 @@ void loop(){
   
   // only send data when connected
   if (connected){
-    // only poll send osc messages every 20 ms
-    if ((millis() - sinceOSC) >= 50){
+    // only poll send osc messages every 33 ms
+    if ((millis() - sinceOSC) >= 33){
       sinceOSC = millis();
       // only send data when relative value changed above threshold
 
@@ -177,8 +177,8 @@ void loop(){
     digitalWrite(BUILTIN_LED, !digitalRead(BUILTIN_LED));
   }
 
-  // only update the screen every 40 milliseconds
-  if (millis() - sinceUpdate >= 100){
+  // only update the screen every 100 milliseconds
+  if (millis() - sinceUpdate >= 200){
     sinceUpdate = millis();
     lcd.setRGB(255, (_pos * 102) % 256, _p2/16);
     // lcd.setRGB(255, _p1/16, _p2/16);
@@ -267,7 +267,7 @@ void displayFunction(int f){
 // a function that displays the value as float 0-1
 void displayValue(int v){
   // downscale the value range
-  int val = int(float(v) / 4096 * 1000);
+  int val = int(float(v) / 4096 * 250);
 
   // only when it changed
   if (_v != val){
@@ -275,7 +275,7 @@ void displayValue(int v){
     // generate a char array for number displaying
     char displayNumber[10];
     // convert float value to string with fixed digits
-    dtostrf(float(val) / 1000, 8, 3, displayNumber);
+    dtostrf(float(val) / 250, 8, 3, displayNumber);
 
     // print the variable number from the knob as float 0-1
     lcd.setCursor(0, 1);
@@ -297,12 +297,12 @@ void startScreen(){
   
   // display my name and wait a little
   lcd.setCursor(0, 1);
-  lcd.send_string(" by tmhglnd.com");
+  lcd.send_string("  by tmhglnd");
   delay(4000);
   
   // display starting and wait a little
   lcd.setCursor(0, 1);
-  lcd.send_string(" starting...   ");
+  lcd.send_string("  starting...");
   delay(3000);
 
   // clear the screen

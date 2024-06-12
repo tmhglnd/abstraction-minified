@@ -37,8 +37,8 @@ io.sockets.on('connection', function(socket){
 
 	// randomize initial values
 	init = {
-		'/control1/function' : Math.random()*4096,
-		'/control2/function' : Math.random()*4096,
+		'/control1/function' : Math.floor(Math.random()*5),
+		'/control2/function' : Math.floor(Math.random()*5),
 		'/control1/value' : Math.random()*4096,
 		'/control2/value' : Math.random()*4096,
 		'/control1/switch' : 1,
