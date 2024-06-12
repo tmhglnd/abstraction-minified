@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <head>
-	<title>ABSTRACTION MINIFIED | by Timo Hoogland | 2024</title>
+	<title>.abstraction().minified() | by tmhglnd | 2024</title>
 
 	<!-- include the amazing hydra-synth by Olivia Jack -->
 	<script src="./node_modules/hydra-synth/dist/hydra-synth.js"></script>
@@ -46,7 +46,7 @@
 		mark {
 			background-color: magenta;
 			color: cyan;
-			mix-blend-mode: difference;
+			/* mix-blend-mode: difference; */
 		}
 
 		.canvas {
@@ -112,12 +112,12 @@
 			});
 
 			// initialize an instance of p5.js for the sounds
-			let p = new p5((p) => {
-				p.setup = () => {
-					p.noCanvas();
-					p.userStartAudio();
-				}
-			});
+			// let p = new p5((p) => {
+			// 	p.setup = () => {
+			// 		p.noCanvas();
+			// 		p.userStartAudio();
+			// 	}
+			// });
 
 			// set resolution for the visuals
 			setResolution(pixels.width, pixels.height);
@@ -145,7 +145,7 @@
 				timer = setTimeout(() => {
 					document.getElementById('o0').style.opacity = 0.5;
 					// p.outputVolume(0.125, 1);
-				}, 10000);
+				}, 5000);
 				// turn on volume if controller is touched
 				// p.outputVolume(0.7, 0.5);
 				document.getElementById('o0').style.opacity = 1;
@@ -186,7 +186,8 @@
 						// }
 					}
 					else if (msg[0].match(/function/)){
-						let f = Math.floor(msg[1] / adcRes * 5);
+						// let f = Math.floor(msg[1] / adcRes * 5);
+						let f = msg[1];						
 						// only change something if the function 
 						// actually changes (not just the knob position)
 						if (f !== c1.function){
@@ -318,7 +319,7 @@
 				mark.innerText = text;
 				paragraph.appendChild(mark);
 			}
-			
+			/*
 			// All the different sound snippets for the installation
 			// Calls a class that is described below
 			// (o) is the output to the speaker
@@ -684,6 +685,7 @@
 					}
 				}
 			}
+			*/
 		}
 	</script>
 </body>

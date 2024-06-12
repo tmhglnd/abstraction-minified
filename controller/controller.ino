@@ -1,11 +1,18 @@
 /*
-  Code for the .abstraction()-minified controller
+  .abstraction().minified()
 
-  This sketch connects the ESP32 Wemos Lolin to another WiFi network and 
-  broadcasts analogRead() osc-messages to all devices in the network
+  Code for the .abstraction().minified() controller.
+  For the interactive coding artwork by Timo Hoogland, 2024
+  www.timohoogland.com
+
+  This sketch connects the ESP32 Wemos Lolin32 to another WiFi network and 
+  broadcasts analogRead() osc-messages to over the network at port 9999
+
+  The RGB display shows the selected function and potmeter value as float 0-1
 
   Based on the WiFiUDPClient.ino example
   Using OSC by Adrian Freed & Yotam Mann
+  Using Waveshare LCD1602 RGB library
   Extended by Timo Hoogland, www.timohoogland.com, 2024
 */
 
@@ -14,12 +21,19 @@
 #include <WiFiUdp.h>
 #include <OSCMessage.h>
 
+// include libraries for LCD1602 RGB
+#include <Wire.h>
+#include "Waveshare_LCD1602_RGB.h"
+
 // WiFi network name and password
-const char * networkName = "RPiAccessPoint";
-const char * networkPswd = "RPiPassWord";
+const char * networkName = "./the-matrix.exe";
+const char * networkPswd = "qnhk4mcVkmdk";
+// const char * networkName = "RPiAccessPoint";
+// const char * networkPswd = "RPiPassWord";
 
 // Broadcast to all devices in the network on port
-const char * udpAddress = "255.255.255.255";
+// const char * udpAddress = "255.255.255.255";
+const char * udpAddress = "192.168.178.35";
 const int udpPort = 9999;
 
 // Are we currently connected?
@@ -28,14 +42,47 @@ boolean connected = false;
 // The udp library class
 WiFiUDP udp;
 
+// the display is 16x2 characters
+Waveshare_LCD1602_RGB lcd(16, 2);
+
+// include library for rotary encoder
+// Using https://github.com/brianlow/Rotary by Brian Low
+#include <Rotary.h>
+
+// S1 = CLK pin, click signal, LOW > HIGH > LOW
+#define CLK_PIN 34
+// S2 = DT pin, lags behind CLK by 90 degrees 
+#define DT_PIN 35
+
+// create instance of rotary for clock and data pin
+Rotary rot = Rotary(CLK_PIN, DT_PIN);
+
 // Define the GPIO pin for a test LED or set the pin for built-in LED
 #define LED_BUILTIN 5
 // Keep track of time since the last blink for status LED
 int sinceBlink = 0;
+// Keep track of time since last screen update
+int sinceUpdate = 0;
+// Keep track of time since last sensor poll
+int sincePoll = 0;
+// Keep track of time since last osc message send
+int sinceOSC = 0;
 
 // define analog read gpio pins where the potmeters are connected to
 #define POT_PIN1 32
 #define POT_PIN2 33
+
+// history for potmeters to filter noise with threshold
+int _p1, _p2;
+int thresh = 6;
+
+// history for potmeter smoothing
+float _s1, _s2;
+float smooth = 0.7;
+
+// value for rotary position
+int pos = 0;
+int _pos = 0;
 
 void setup(){
   // set the pin modes
@@ -43,23 +90,49 @@ void setup(){
   pinMode(POT_PIN1, INPUT);
   pinMode(POT_PIN2, INPUT);
 
+  pinMode(CLK_PIN, INPUT);
+  pinMode(DT_PIN, INPUT);
+
   // initilize hardware serial:
   Serial.begin(115200);
-  
+
+  // initialize LCD
+  lcd.init();
+
+  // enable cursor blinking
+  // lcd.blink();
+
+  // run the startscreen
+  lcd.setRGB(255, 255, 255);
+  startScreen();
+
+  // initialize the rotary encoder
+  rot.begin();
+ 
   // connect to the WiFi network and start udp
   connectToWiFi(networkName, networkPswd);
-  udp.begin(udpPort);
+  // udp.begin(udpPort);
 }
 
-// history for potmeters to filter noise with threshold
-int _p1, _p2;
-int thresh = 5;
-
-// history for potmeter smoothing
-float _s1, _s2;
-float smooth = 0.75;
-
 void loop(){
+  // read rotary direction change and inc/dec the position
+  int dir = rot.process();
+
+  if (dir == DIR_CW){
+    pos++;
+    if (pos > 4){ pos = 0; }
+  } else if (dir == DIR_CCW){
+    pos--;
+    if (pos < 0){ pos = 4; }
+  }
+
+  // Uncomment for posting rotary position in the monitor
+  // if (pos != _pos){
+  //   _pos = pos;
+  //   Serial.print(" rotary: ");
+  //   Serial.println(pos);
+  // }
+
   // read the values from the potmeters
   int pot1 = analogRead(POT_PIN1);
   int pot2 = analogRead(POT_PIN2);
@@ -73,29 +146,52 @@ void loop(){
   // Serial.print(_p1);
   // Serial.print(" ");
   // Serial.println(_p2);
-
+  
   // only send data when connected
   if (connected){
-    // only send data when relative value changed above threshold
-    if (abs(_s1 - _p1) > thresh){
-      sendMessage("/control1/function", _s1);
-      _p1 = _s1;
-    }
-    if (abs(_s2 - _p2) > thresh){
-      sendMessage("/control1/value", _s2);
-      _p2 = _s2;
+    // only poll send osc messages every 20 ms
+    if ((millis() - sinceOSC) >= 50){
+      sinceOSC = millis();
+      // only send data when relative value changed above threshold
+
+      if (pos != _pos){
+        _pos = pos;
+        sendMessage("/control1/function", _pos);
+      }
+      
+      // if (abs(_s1 - _p1) > thresh){
+      //   sendMessage("/control1/function", _s1);
+      //   _p1 = _s1;
+      // }
+      if (abs(_s2 - _p2) > thresh){
+        sendMessage("/control1/value", _s2);
+        _p2 = _s2;
+      }
     }
   }
 
-  // status LED blinks every 500 on/off to indicate WiFi is connected
-  // the status LED blinks rapidly every 100ms to indicate no WiFi connection
-  if (millis() - sinceBlink >= (50 + connected * 450)){
-    digitalWrite(BUILTIN_LED, !digitalRead(BUILTIN_LED));
+  // status LED blinks every 1000 on/off to indicate WiFi is connected
+  // the status LED blinks rapidly every 50ms to indicate no WiFi connection
+  if (millis() - sinceBlink >= (50 + connected * 950)){
     sinceBlink = millis();
+    digitalWrite(BUILTIN_LED, !digitalRead(BUILTIN_LED));
   }
+
+  // only update the screen every 40 milliseconds
+  if (millis() - sinceUpdate >= 100){
+    sinceUpdate = millis();
+    lcd.setRGB(255, (_pos * 102) % 256, _p2/16);
+    // lcd.setRGB(255, _p1/16, _p2/16);
+    displayFunction(_pos);
+    // displayFunction(_p1);
+    displayValue(_p2);
+  }
+
+  // display the text with function and parameter value
+  // displayTextAndLED(_p1, _p2, 0);
 
   // wait a little to reduce cpu cycles
-  delay(40);
+  delay(1);
 }
 
 // A function that sends an OSC-message to specified IP and Port
@@ -145,4 +241,70 @@ void WiFiEvent(WiFiEvent_t event){
       break;
     default: break;
   }
+}
+
+// function names for display
+char *functionNames[] = { "squiggle", "mosaic", "smear", "glass", "paint" };
+// history for values to adjust only when changing.
+int _f = -1;
+int _v = -1;
+
+// a function that displays the function name
+void displayFunction(int f){
+  // print the function name on first line
+  // only when it changed
+  // int func = int(float(f) / 4096 * 5);
+  int func = f;
+  if (_f != func){
+    _f = func;
+    lcd.setCursor(0, 0);
+    lcd.send_string(" .");
+    lcd.send_string(functionNames[_f]);
+    lcd.send_string("(   ");
+  }
+}
+
+// a function that displays the value as float 0-1
+void displayValue(int v){
+  // downscale the value range
+  int val = int(float(v) / 4096 * 1000);
+
+  // only when it changed
+  if (_v != val){
+    _v = val;
+    // generate a char array for number displaying
+    char displayNumber[10];
+    // convert float value to string with fixed digits
+    dtostrf(float(val) / 1000, 8, 3, displayNumber);
+
+    // print the variable number from the knob as float 0-1
+    lcd.setCursor(0, 1);
+    lcd.send_string("   ");
+    // lcd.send_string(char(val));
+    lcd.send_string(displayNumber);
+
+    // end the line of code
+    lcd.send_string(" );");
+  }
+}
+
+// A function that displays the startscreen message
+void startScreen(){
+  // display the installation name and wait a little
+  lcd.setCursor(0, 0);
+  lcd.send_string(".abstraction()");
+  delay(1000);
+  
+  // display my name and wait a little
+  lcd.setCursor(0, 1);
+  lcd.send_string(" by tmhglnd.com");
+  delay(4000);
+  
+  // display starting and wait a little
+  lcd.setCursor(0, 1);
+  lcd.send_string(" starting...   ");
+  delay(3000);
+
+  // clear the screen
+  lcd.clear();
 }
