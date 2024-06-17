@@ -47,12 +47,14 @@ It is possible to run this installation on a Raspberry Pi 4+ (3 or 2 are also po
 	- screen, keyboard and mouse while setting up
 	- Wi-Pi wifi dongle for RPi2
 	- TFT LCD Screen RPi compatible (eg. 3.5" waveshare)
-- Wemos Lolin32 with soldered header pins
+- Wemos Lolin32 (ESP32) with soldered header pins
 	- 1 Micro-usb cable for data transfer
 	- 1 LiPo battery 3.7V 500mAh (optional)
-- Breadboard and jumperwires
-	- 2 Potentiometers
-	- Protoboard and wires (optional for soldering everything)
+	- 1 On-Off switch (optional)
+- 1 10kOhm potentiometer
+- 1 Rotary Encoder (20 steps or more)
+- 1 Waveshare LCD1602 RGB Module
+- Breadboard and jumperwires to connect everything
 
 ## Install NodeJS and Node Version Manager on RPi
 
