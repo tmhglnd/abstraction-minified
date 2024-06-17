@@ -7,8 +7,8 @@
 	<!-- socket.io for communication between browser and device -->
 	<script src="./node_modules/socket.io/client-dist/socket.io.min.js"></script>
 	<!-- include the p5.js library for sound processing -->
-	<script src="./node_modules/p5/lib/p5.js"></script>
-	<script src="./node_modules/p5/lib/addons/p5.sound.js"></script>
+	<!-- <script src="./node_modules/p5/lib/p5.js"></script> -->
+	<!-- <script src="./node_modules/p5/lib/addons/p5.sound.js"></script> -->
 	<!-- include total serialism library for algorithmic composition -->
 	<script src="./node_modules/total-serialism/build/ts.bundle.js"></script>
 
@@ -83,7 +83,7 @@
 			// RPi5: 480 x 270 at least (but haven't tried higher)
 			// RPi4: 480 x 270
 			// RPi2 & 3: 160 x 90
-			const pixels = { width: 160, height: 90 };
+			const pixels = { width: 128, height: 72 };
 
 			// the resolution of the adc from the microcontroller
 			// for Arduino use 1024, for 10-bit (like ESP) use 4096

@@ -70,15 +70,14 @@ int sincePoll = 0;
 int sinceOSC = 0;
 
 // define analog read gpio pins where the potmeters are connected to
-#define POT_PIN1 32
-#define POT_PIN2 33
+#define POT_PIN1 33
 
 // history for potmeters to filter noise with threshold
-int _p1, _p2;
+int _p1;
 int thresh = 10;
 
 // history for potmeter smoothing
-float _s1, _s2;
+float _s1;
 float smooth = 0.7;
 
 // value for rotary position
@@ -89,7 +88,6 @@ void setup(){
   // set the pin modes
   pinMode(LED_BUILTIN, OUTPUT);
   pinMode(POT_PIN1, INPUT);
-  pinMode(POT_PIN2, INPUT);
 
   pinMode(CLK_PIN, INPUT);
   pinMode(DT_PIN, INPUT);
@@ -135,18 +133,14 @@ void loop(){
   // }
 
   // read the values from the potmeters
-  // int pot1 = analogRead(POT_PIN1);
-  int pot2 = analogRead(POT_PIN2);
+  int pot1 = analogRead(POT_PIN1);
 
   // apply a lowpass filter on the readings
-  // _s1 = pot1 * (1-smooth) + _s1 * smooth;
-  _s2 = pot2 * (1-smooth) + _s2 * smooth;
+  _s1 = pot1 * (1-smooth) + _s1 * smooth;
 
   // Uncomment for plotting in the Serial Plotter and Monitor
   // Serial.print("0 4096 ");
   // Serial.print(_p1);
-  // Serial.print(" ");
-  // Serial.println(_p2);
   
   // only send data when connected
   if (connected){
@@ -159,25 +153,20 @@ void loop(){
         _pos = pos;
         sendMessage("/control1/function", _pos);
       }
-      
-      // if (abs(_s1 - _p1) > thresh){
-      //   sendMessage("/control1/function", _s1);
-      //   _p1 = _s1;
-      // }
-      if (abs(_s2 - _p2) > thresh){
-        sendMessage("/control1/value", _s2);
-        _p2 = _s2;
+      if (abs(_s1 - _p1) > thresh){
+        sendMessage("/control1/value", _s1);
+        _p1 = _s1;
       }
     }
 
     // only update the screen every 100 milliseconds
     if (millis() - sinceUpdate >= 250){
       sinceUpdate = millis();
-      lcd.setRGB(255, (_pos * 102) % 256, _p2/16);
+      lcd.setRGB(255, (_pos * 102) % 256, _p1/16);
       // lcd.setRGB(255, _p1/16, _p2/16);
       displayFunction(_pos);
       // displayFunction(_p1);
-      displayValue(_p2);
+      displayValue(_p1);
     }
   } else {
     // not connected yet
