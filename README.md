@@ -112,7 +112,7 @@ Copy/paste/execute the command printed in the terminal and afterwards save the s
 
 Some useful commands to monitor processes while the installation runs:
 
-`pm2 list`, `pm2 monit`, `pm2 logs [process name]`
+`pm2 list`, `pm2 monit`, `pm2 logs <process-name>`, use `pm2 stop <process-name>` to quit
 
 ## Run browser in fullscreen on RPi
 
@@ -138,7 +138,7 @@ Then run the following command to hide the cursor after 1 second
 
 ## Extend with an RPi Screen
 
-You can combine the installation with a little RPi LCD screen to create a version that can run standalone in the living room as a kind of generative picture frame. For example use the [`3.5 inch RPi LCD Screen`](https://www.waveshare.com/3.5inch-rpi-lcd-c.htm)
+You can combine the installation with a little RPi LCD screen to create a version that can run standalone in the living room as a generative picture frame. For example use the [`3.5 inch RPi LCD Screen`](https://www.waveshare.com/3.5inch-rpi-lcd-c.htm)
 
 `git clone https://github.com/waveshare/LCD-show.git`
 
@@ -158,11 +158,29 @@ Set the correct resolution via the Preferences > Configuration of the RPi. If yo
 
 ## Built the hardware controller
 
+You can build a hardware controller for the installation to control parameters in the visuals. The controller uses:
+
+- 1x Wemos ESP32 Lolin
+- 1x 10kOhm potmeter
+- 1x Rotary Encoder (20 steps)
+- 1x Waveshare LCD1602 RGB Module
+- 1x Lipo Battery 3.7V 500mAh (optional)
+- 1x On-Off switch (optional)
+- Some wires to connect everything
+
 The [ESP32 Lolin](https://www.wemos.cc/en/latest/d32/d32.html) is a microcontroller that has many of the same functionalities as an Arduino allowing us to read the voltage from a potmeter (variable resistor) or some other sensor through an `analogRead()`. The extra benefit of this microcontroller is that it can run wireless, accessing a WiFi network or creating its own access point. It also can be powered through a LiPo battery of 500mAh.
 
-Connect the potentiometers of your choice to the board. For example a standard potentiometer of 10kOhm can be connected easily. The potmeter has 3 pins, leftmost pin can go to the ground (GND), rightmost pin goes to the power (3V). The middle pin can be read from a GPIO pin on the ESP32 board.
+Connect the potentiometer of your choice to the board. For example a standard potentiometer of 10kOhm can be connected easily. The potmeter has 3 pins, leftmost pin can go to the ground (GND), rightmost pin goes to the power (3V). The middle pin can be read from a GPIO pin on the ESP32 board. The arduino code uses pin `32`.
 
-**Note: Choose a GPIO pin from ADC1**. [See the schematic here](https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fmischianti.org%2Fwp-content%2Fuploads%2F2020%2F11%2FESP32-WeMos-LOLIN32-pinout-mischianti-1024x562.png&f=1&nofb=1&ipt=88e6d3051ddbbf0c0ed73a787bd206160372b5ab19359411a17a5456f0aa1b12&ipo=images) Pins with ADC2 are disabled when the ESP32 is connected via WiFi.
+Connect the rotary encoder to the ESP based on the datasheet of the encoder you have. In most cases there is a 3/5V and GND pin that can be connected directly to the ESP, and a CLK (clock) and DT (data) pin, or S1 and S2 that can be connected to 2 GPIO pins the arduino code uses GPIO pin `34` and `35`.
+
+Connect the RGB Module to the ESP based on the datasheet of the module. Use pin `21` for `SDA` and `22` for `SCL`.
+
+Optionally you can connect a Li-Po battery to the ESP32 to run the controller wirelessly. You can solder an ON/OFF switch in between the 3.7V connection to create a simple switch for the controller. *Be aware that the switch needs to be on if you want to charge the controller*.
+
+**Note: Choose a GPIO pin from ADC1**. [See the WEMOS Lolin32 Pin Layout here](https://nerdytechy.com/wp-content/uploads/2021/06/wemos-lolin32-pinout-1536x843.png). Pins with `ADC2` are disabled when the ESP32 is connected via WiFi.
+
+<!-- https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fmischianti.org%2Fwp-content%2Fuploads%2F2020%2F11%2FESP32-WeMos-LOLIN32-pinout-mischianti-1024x562.png&f=1&nofb=1&ipt=88e6d3051ddbbf0c0ed73a787bd206160372b5ab19359411a17a5456f0aa1b12&ipo=images OLD URL -->
 
 ## Uploading code to the ESP32
 
@@ -186,7 +204,7 @@ const char * networkName = "RPiAccessPoint";
 const char * networkPswd = "RPiPassWord";
 ```
 
-If the connection works the LED blinks slowly, every 500 ms.
+If the connection works the LED blinks slowly, every 1000 ms.
 
 ## Setting up RPi as WiFi Access Point
 

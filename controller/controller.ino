@@ -26,14 +26,15 @@
 #include "Waveshare_LCD1602_RGB.h"
 
 // WiFi network name and password
-const char * networkName = "./the-matrix.exe";
-const char * networkPswd = "qnhk4mcVkmdk";
-// const char * networkName = "RPiAccessPoint";
-// const char * networkPswd = "RPiPassWord";
+// const char * networkName = "./the-matrix.exe";
+// const char * networkPswd = "qnhk4mcVkmdk";
+const char * networkName = "RPiAccessPoint";
+const char * networkPswd = "RPiPassWord";
 
 // Broadcast to all devices in the network on port
 // const char * udpAddress = "255.255.255.255";
-const char * udpAddress = "192.168.178.35";
+// Destionation IP is raspberry pi's static ip address
+const char * udpAddress = "192.168.4.1";
 const int udpPort = 9999;
 
 // Are we currently connected?
@@ -94,7 +95,7 @@ void setup(){
   pinMode(DT_PIN, INPUT);
 
   // initilize hardware serial:
-  Serial.begin(115200);
+  Serial.begin(9600);
 
   // initialize LCD
   lcd.init();
@@ -102,13 +103,13 @@ void setup(){
   // enable cursor blinking
   // lcd.blink();
 
-  // connect to the WiFi network and start udp
-  connectToWiFi(networkName, networkPswd);
-  // udp.begin(udpPort);
-
   // run the startscreen
   lcd.setRGB(255, 255, 255);
   startScreen();
+
+  // connect to the WiFi network and start udp
+  connectToWiFi(networkName, networkPswd);
+  // udp.begin(udpPort);
 
   // initialize the rotary encoder
   rot.begin();
@@ -149,8 +150,8 @@ void loop(){
   
   // only send data when connected
   if (connected){
-    // only poll send osc messages every 33 ms
-    if ((millis() - sinceOSC) >= 33){
+    // only poll send osc messages every 20 ms
+    if ((millis() - sinceOSC) >= 20){
       sinceOSC = millis();
       // only send data when relative value changed above threshold
 
@@ -168,6 +169,20 @@ void loop(){
         _p2 = _s2;
       }
     }
+
+    // only update the screen every 100 milliseconds
+    if (millis() - sinceUpdate >= 250){
+      sinceUpdate = millis();
+      lcd.setRGB(255, (_pos * 102) % 256, _p2/16);
+      // lcd.setRGB(255, _p1/16, _p2/16);
+      displayFunction(_pos);
+      // displayFunction(_p1);
+      displayValue(_p2);
+    }
+  } else {
+    // not connected yet
+    lcd.setCursor(0, 0);
+    lcd.send_string("connecting...");
   }
 
   // status LED blinks every 1000 on/off to indicate WiFi is connected
@@ -176,19 +191,6 @@ void loop(){
     sinceBlink = millis();
     digitalWrite(BUILTIN_LED, !digitalRead(BUILTIN_LED));
   }
-
-  // only update the screen every 100 milliseconds
-  if (millis() - sinceUpdate >= 200){
-    sinceUpdate = millis();
-    lcd.setRGB(255, (_pos * 102) % 256, _p2/16);
-    // lcd.setRGB(255, _p1/16, _p2/16);
-    displayFunction(_pos);
-    // displayFunction(_p1);
-    displayValue(_p2);
-  }
-
-  // display the text with function and parameter value
-  // displayTextAndLED(_p1, _p2, 0);
 
   // wait a little to reduce cpu cycles
   delay(1);
@@ -267,7 +269,7 @@ void displayFunction(int f){
 // a function that displays the value as float 0-1
 void displayValue(int v){
   // downscale the value range
-  int val = int(float(v) / 4096 * 250);
+  int val = int(float(v) / 4096 * 110);
 
   // only when it changed
   if (_v != val){
@@ -275,7 +277,7 @@ void displayValue(int v){
     // generate a char array for number displaying
     char displayNumber[10];
     // convert float value to string with fixed digits
-    dtostrf(float(val) / 250, 8, 3, displayNumber);
+    dtostrf(float(val) / 110, 8, 3, displayNumber);
 
     // print the variable number from the knob as float 0-1
     lcd.setCursor(0, 1);
@@ -298,12 +300,7 @@ void startScreen(){
   // display my name and wait a little
   lcd.setCursor(0, 1);
   lcd.send_string("  by tmhglnd");
-  delay(4000);
-  
-  // display starting and wait a little
-  lcd.setCursor(0, 1);
-  lcd.send_string("  starting...");
-  delay(3000);
+  delay(5000);
 
   // clear the screen
   lcd.clear();
