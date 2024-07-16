@@ -24,6 +24,14 @@ Then navigate in the browser to:
 
 `http://localhost:3000`
 
+Send OSC messages to control the visual function and parameter to:
+
+`port 9999`
+
+`/control1/function <0-4>`
+
+`/control1/value <0-4096>`
+
 # Make this into an installation running on a Raspberry Pi
 
 It is possible to run this installation on a Raspberry Pi 4+ (3 or 2 are also possible but on a low visual resolution, like 160x90 pixels or less, this however is aesthetically quite pleasing!).
@@ -181,6 +189,14 @@ Connect the RGB Module to the ESP based on the datasheet of the module. Use pin 
 Optionally you can connect a Li-Po battery to the ESP32 to run the controller wirelessly. You can solder an ON/OFF switch in between the 3.7V connection to create a simple switch for the controller. *Be aware that the switch needs to be on if you want to charge the controller*.
 
 **Note: Choose a GPIO pin from ADC1**. [See the WEMOS Lolin32 Pin Layout here](https://nerdytechy.com/wp-content/uploads/2021/06/wemos-lolin32-pinout-1536x843.png). Pins with `ADC2` are disabled when the ESP32 is connected via WiFi.
+
+Pin overiew:
+
+- `21` - Display SDA
+- `22` - Display SCL
+- `32` - Potmeter
+- `34` - Rotary CLK/S1
+- `35` - Rotary DT/S2
 
 <!-- https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fmischianti.org%2Fwp-content%2Fuploads%2F2020%2F11%2FESP32-WeMos-LOLIN32-pinout-mischianti-1024x562.png&f=1&nofb=1&ipt=88e6d3051ddbbf0c0ed73a787bd206160372b5ab19359411a17a5456f0aa1b12&ipo=images OLD URL -->
 
