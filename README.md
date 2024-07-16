@@ -8,7 +8,7 @@ A minified version of the [`.abstraction()`](https://github.com/tmhglnd/abstract
 [![](https://img.shields.io/static/v1?label=Support%20on%20Patreon&message=%E2%9D%A4&logo=Patreon)](https://www.patreon.com/bePatron?u=9649817)
 [![](https://img.shields.io/static/v1?label=Support%20on%20Gumroad&message=%E2%9D%A4&logo=Gumroad)](https://tmhglnd.gumroad.com/)
 
-<!-- ![](./images/img1.JPG) -->
+![](./images/img1.jpeg)
 
 # Install
 
@@ -326,7 +326,7 @@ For troubleshooting see [this page](https://learn.adafruit.com/setting-up-a-rasp
 
 # Acknowledgements
 
-This installation is a derivative of the `.abstraction()` installation that was originally commissioned by the [CODA Museum](https://www.coda-apeldoorn.nl/) in Apeldoorn, The Netherlands.
+This installation is a derivative version of the `.abstraction()` installation that was originally commissioned by the [CODA Museum](https://www.coda-apeldoorn.nl/) in Apeldoorn, The Netherlands.
 
 This project was made possible thanks to the usage following amazing platforms and libraries:
 
@@ -344,6 +344,10 @@ This project was made possible thanks to the usage following amazing platforms a
 	- [https://github.com/CNMAT/OSC](https://github.com/CNMAT/OSC)
 - HD44780 LCD by Bill Perry
 	- [https://github.com/duinoWitchery/hd44780](https://github.com/duinoWitchery/hd44780)
+- Waveshare RGB Module
+	- [https://www.waveshare.com/wiki/LCD1602_RGB_Module](https://www.waveshare.com/wiki/LCD1602_RGB_Module#Library_file_loading_for_Arduino)
+- Rotary by Brian Low
+	- [https://github.com/brianlow/Rotary](https://github.com/brianlow/Rotary)
 - NodeJS
 	- [https://nodejs.org/en/](https://nodejs.org/en/)
 - Node Package Manager (npm)
