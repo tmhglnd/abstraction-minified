@@ -25,6 +25,11 @@ const server = app.listen(port, () => {
 	}
 });
 
+// an extra client for forwarding messages to PureData
+const { Client } = require('node-osc');
+const pdPort = 8888;
+let client = new Client('127.0.0.1', pdPort);
+
 // connect via socket io
 const io = socket(server);
 
@@ -72,6 +77,7 @@ let osc = new Server(oscPort, '0.0.0.0', () => {
 
 		// forward to the browser
 		io.emit('message', ...msg);
+		client.send(msg[0], msg[1]);
 	});
 });
 
