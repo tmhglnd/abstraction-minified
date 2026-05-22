@@ -1,0 +1,10 @@
+#N canvas 827 239 734 565 12;
+#X obj 59 217 outlet~;
+#X text 181 91 doesn't include any anti-aliasing;
+#X text 181 58 a very crude square wave oscillator;
+#X obj 59 117 phasor~ \$1;
+#X obj 59 59 inlet;
+#X obj 59 157 expr~ ($v1 < 0.5) * 2 - 1;
+#X connect 3 0 5 0;
+#X connect 4 0 3 0;
+#X connect 5 0 0 0;
