@@ -2,7 +2,7 @@
   .abstraction().minified()
 
   Code for the .abstraction().minified() controller.
-  For the interactive coding artwork by Timo Hoogland, 2024
+  For the interactive coding artwork by Timo Hoogland, 2024-2026
   www.timohoogland.com
 
   This sketch connects the ESP32 Wemos Lolin32 to another WiFi network and 
@@ -74,11 +74,11 @@ int sinceOSC = 0;
 
 // history for potmeters to filter noise with threshold
 int _p1;
-int thresh = 10;
+int thresh = 1;
 
 // history for potmeter smoothing
 float _s1;
-float smooth = 0.7;
+float smooth = 0.5;
 
 // value for rotary position
 int pos = 0;
@@ -132,11 +132,11 @@ void loop(){
   //   Serial.println(pos);
   // }
 
-  // read the values from the potmeters
-  int pot1 = analogRead(POT_PIN1);
+  // read the values from the potmeters and downscale to reduce noise
+  int pot1 = analogRead(POT_PIN1) / 16;
 
   // apply a lowpass filter on the readings
-  _s1 = pot1 * (1-smooth) + _s1 * smooth;
+  _s1 = pot1 * (1 - smooth) + _s1 * smooth;
 
   // Uncomment for plotting in the Serial Plotter and Monitor
   // Serial.print("0 4096 ");
@@ -144,25 +144,24 @@ void loop(){
   
   // only send data when connected
   if (connected){
-    // only poll send osc messages every 20 ms
-    if ((millis() - sinceOSC) >= 20){
+    // only send osc messages every 20 ms
+    if ((millis() - sinceOSC) >= 25){
       sinceOSC = millis();
       // only send data when relative value changed above threshold
-
       if (pos != _pos){
         _pos = pos;
         sendMessage("/control1/function", _pos);
       }
-      if (abs(_s1 - _p1) > thresh){
+      if (abs(int(_s1) - _p1) > thresh){
         sendMessage("/control1/value", _s1);
         _p1 = _s1;
       }
     }
 
     // only update the screen every 100 milliseconds
-    if (millis() - sinceUpdate >= 250){
+    if (millis() - sinceUpdate >= 100){
       sinceUpdate = millis();
-      lcd.setRGB(255, (_pos * 102) % 256, _p1/16);
+      lcd.setRGB(255, (_pos * 102) % 256, _p1);
       // lcd.setRGB(255, _p1/16, _p2/16);
       displayFunction(_pos);
       // displayFunction(_p1);
@@ -258,7 +257,7 @@ void displayFunction(int f){
 // a function that displays the value as float 0-1
 void displayValue(int v){
   // downscale the value range
-  int val = int(float(v) / 4096 * 110);
+  int val = v;//int(float(v) / 512 * 1000);
 
   // only when it changed
   if (_v != val){
@@ -266,7 +265,7 @@ void displayValue(int v){
     // generate a char array for number displaying
     char displayNumber[10];
     // convert float value to string with fixed digits
-    dtostrf(float(val) / 110, 8, 3, displayNumber);
+    dtostrf(float(val) / 255, 8, 3, displayNumber);
 
     // print the variable number from the knob as float 0-1
     lcd.setCursor(0, 1);
