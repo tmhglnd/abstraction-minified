@@ -69,7 +69,7 @@
 #X obj 580 19 loadbang;
 #X msg 597 180 1;
 #X obj 652 472 i 300;
-#X obj 140 516 s tempo;
+#X obj 939 516 s tempo;
 #X obj 667 45 r tempo;
 #X msg 125 603 -4;
 #X obj 1028 77 oscparse;
@@ -159,6 +159,7 @@
 #X connect 44 0 102 0;
 #X connect 44 0 101 0;
 #X connect 46 0 12 1;
+#X connect 46 0 68 0;
 #X connect 47 0 48 0;
 #X connect 48 0 46 1;
 #X connect 49 0 50 0;
@@ -172,7 +173,6 @@
 #X connect 57 0 63 0;
 #X connect 58 0 59 0;
 #X connect 59 0 24 1;
-#X connect 59 0 68 0;
 #X connect 60 0 61 0;
 #X connect 61 0 59 1;
 #X connect 62 0 50 1;
