@@ -35,7 +35,7 @@
 #X obj 68 236 catch~ mainOut;
 #X obj 68 419 dac~ 1 2;
 #X obj 900 378 r control;
-#X obj 1106 341 s control;
+#X obj 1106 307 s control;
 #X floatatom 178 669 5 0 0 0 - - - 12;
 #X floatatom 576 668 5 0 0 0 - - - 12;
 #X floatatom 777 666 5 0 0 0 - - - 12;
@@ -86,7 +86,7 @@
 #X text 1141 126 route for controller messages;
 #X text 1164 213 send throughout patch;
 #X floatatom 1028 213 5 0 0 0 - - - 0;
-#X floatatom 1106 214 5 0 0 0 - - - 0;
+#X floatatom 1106 213 5 0 0 0 - - - 0;
 #X text 668 251 the main sequencer;
 #X text 732 175 tempo mapping from controls;
 #X text 188 693 separate mixers;
@@ -111,12 +111,11 @@
 #X obj 501 267 line~;
 #X msg 501 236 \$1 2000;
 #X obj 68 349 expr~ tanh($v1);
-#X obj 1106 245 / 4;
-#X obj 1106 278 change;
-#X obj 1106 312 / 1024;
-#X text 1164 277 small smoothing on the data;
-#X text 1164 301 reducing noise;
+#X obj 1106 245 change;
+#X text 1164 244 small smoothing on the data;
+#X text 1164 268 reducing noise;
 #X text 140 537 squiggle controls tempo;
+#X obj 1106 278 / 256;
 #X connect 5 0 6 0;
 #X connect 6 0 27 0;
 #X connect 8 0 9 0;
@@ -136,6 +135,7 @@
 #X connect 19 0 20 0;
 #X connect 19 0 18 0;
 #X connect 19 0 24 0;
+#X connect 19 0 8 0;
 #X connect 20 0 19 1;
 #X connect 21 0 11 0;
 #X connect 21 0 67 0;
@@ -180,7 +180,6 @@
 #X connect 64 0 53 1;
 #X connect 65 0 105 0;
 #X connect 66 0 17 0;
-#X connect 67 0 8 0;
 #X connect 69 0 23 0;
 #X connect 70 0 43 0;
 #X connect 71 0 75 0;
@@ -217,6 +216,5 @@
 #X connect 108 0 107 0;
 #X connect 109 0 32 1;
 #X connect 109 0 32 0;
-#X connect 110 0 111 0;
-#X connect 111 0 112 0;
-#X connect 112 0 34 0;
+#X connect 110 0 114 0;
+#X connect 114 0 34 0;
