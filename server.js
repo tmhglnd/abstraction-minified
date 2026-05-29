@@ -18,12 +18,12 @@ const server = app.listen(port, () => {
 	console.log(`Run 'node server.js --debug' for logs`);
 	
 	if (rpi() && !verbose){
-		// start the puredata patch on the rPi
-		shell.exec(`pd -alsa -r 44100 -blocksize 1024 -audiobuf 50 -noadc -outchannels 2 -audioadddev "bcm2835 Headphones (hardware)" pd/abstraction-sound-main.pd`);
 		// hide mouse when not moving
 		shell.exec(`unclutter -idle 1`);
 		// open browser in fullscreen incognito when on rpi
 		shell.exec(`chromium-browser --start-fullscreen --start-maximized --incognito http://localhost:${port}`);
+		// start the puredata patch on the rPi
+		shell.exec(`pd -nogui -alsa -r 44100 -blocksize 2048 -audiobuf 100 -noadc -outchannels 2 -audioadddev "bcm2835 Headphones (hardware)" pd/abstraction-sound-main.pd`);
 	}
 });
 
