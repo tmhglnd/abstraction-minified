@@ -1,3 +1,5 @@
+Moved to Codeberg: https://codeberg.org/tmhglnd/abstraction-minified
+
 # Abstraction Minified
 
 A minified version of the [`.abstraction()`](https://github.com/tmhglnd/abstraction) installation that can be run on a RPi2+ with a small LCD screen and controlled with a self-build wireless controller using for example an ESP32.
