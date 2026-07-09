@@ -1,6 +1,6 @@
 
-> [!IMPORTANT]
-> Development moved to Codeberg: https://codeberg.org/tmhglnd/abstraction-minified
+> [!WARNING]
+> **Development moved to Codeberg: https://codeberg.org/tmhglnd/abstraction-minified**
 
 # Abstraction Minified
 
